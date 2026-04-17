@@ -1,0 +1,21 @@
+# Этап 1: Сборка React
+FROM node:18-alpine as build
+
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm install
+COPY frontend/ .
+RUN npm run build
+
+# Этап 2: Nginx для отдачи статики
+FROM nginx:alpine
+
+# Копируем собранный React
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Копируем конфиг nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
