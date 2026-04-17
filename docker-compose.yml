@@ -2,34 +2,23 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: django-backend
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
+    build: ./backend
     volumes:
       - ./backend:/app
+      - backend_data:/app
+    expose:
+      - "8000"
     environment:
-      - DEBUG=0
-      - ALLOWED_HOSTS=111.88.150.150,localhost
-    networks:
-      - app-network
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: react-frontend
-    restart: unless-stopped
+    build: ./frontend
     ports:
       - "80:80"
     depends_on:
       - backend
-    networks:
-      - app-network
+    restart: unless-stopped
 
-networks:
-  app-network:
-    driver: bridge
+volumes:
+  backend_data:
